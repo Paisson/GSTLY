@@ -7,6 +7,7 @@ class DJToolGUI:
         self.tool = tool
         self.root = root
         self.root.title("DJ Tool")
+        self.counter = 0
 
         # Create a notebook
         self.notebook = ttk.Notebook(root)
@@ -62,13 +63,13 @@ class DJToolGUI:
         self.tool.download_path = filedialog.askdirectory()
         print(f'Path set to {self.tool.download_path}')
 
-    def download_thread_callback(self, thread_id, query):
-        self.info_label['text'] = f'Thread {thread_id} finished: {query}'
+    def download_thread_callback(self, query):
+        pass 
 
     def download_worker(self, query):
         thread_id = threading.current_thread().ident
         self.tool.download_video(query)
-        self.download_thread_callback(thread_id, query)
+        #self.download_thread_callback(thread_id, query)
 
     def check_thread_completion(self):
         if self.tool.thread_completion_event.is_set():
