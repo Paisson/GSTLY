@@ -1,6 +1,7 @@
-from DJToolGUI import DJToolGUI
+from djtoolgui import DJToolGUI
 import tkinter as tk
 import subprocess
+import threading
 
 
 class DJTool:
@@ -10,25 +11,25 @@ class DJTool:
         self.allow_playlist = tk.BooleanVar()
         self.allow_playlist.set(False)
 
-    # Runs the command and prints result
-    def run_command(self, command):
-        result = subprocess.run(command, capture_output=True, text=True)
-        print(result.stdout)
+        self.thread_completion_event = threading.Event()
 
-    # Start download with max_downloads
+    def run_command(self, command):
+        subprocess.run(command, capture_output=True, text=True)
+
     def download_video(self, search_query):
         if self.allow_playlist.get() is False:
-            if self.max_downloads > 0: 
+            if self.max_downloads > 0:
                 command = f'yt-dlp -P {self.download_path} --no-playlist --add-metadata --embed-thumbnail --match-filter "duration < 1800" --max-downloads {self.max_downloads} {search_query}'
             else:
                 command = f'yt-dlp -P {self.download_path} --no-playlist --add-metadata --embed-thumbnail --match-filter "duration < 1800" {search_query}'
-        else: 
-            if self.max_downloads > 0: 
+        else:
+            if self.max_downloads > 0:
                 command = f'yt-dlp -P {self.download_path} --add-metadata --embed-thumbnail --match-filter "duration < 1800" --max-downloads {self.max_downloads} {search_query}'
             else:
                 command = f'yt-dlp -P {self.download_path} --add-metadata --embed-thumbnail --match-filter "duration < 1800" {search_query}'
-        self.run_command(command)   
-        print('Done') 
+
+        self.run_command(command)
+        self.thread_completion_event.set()
 
 
 if __name__ == "__main__":
