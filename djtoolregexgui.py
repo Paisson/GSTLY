@@ -6,6 +6,7 @@ class DJToolRegexHelperGUI:
 
         self.regex = regex
         self.root = root
+        self.pattern = None
 
         # Configure column weights
         root.columnconfigure(0, weight=1)
@@ -20,32 +21,33 @@ class DJToolRegexHelperGUI:
 
         # Create dir button and pack it in grid
         self.select_dir_button = tk.Button(root, text="Directory", command=self.select_input_dir)
-        self.select_dir_button.grid(row=1, column=0)
+        self.select_dir_button.grid(row=2, column=0)
 
 
         # Create regex pattern drop down menu define options and pack it into grid
-        self.options = ['[...]','.mp3']
+        self.options = ['[...]','FREE DL',]
         self.selected_option = tk.StringVar() # Create a StringVar to hold the selected option
         self.selected_option.set('Select Pattern')  # Default value
-        self.select_regex_pattern_menu = tk.OptionMenu(self.root, self.selected_option, *self.options, command=self.remove_regex_pattern)
-        self.select_regex_pattern_menu.grid(row=1, column=2)
+        self.select_regex_pattern_menu = tk.OptionMenu(self.root, self.selected_option, *self.options, command=self._set_pattern)
+        self.select_regex_pattern_menu.grid(row=1, column=1)
 
-        # Create Info Label
-        self.info_label = tk.Label(self.root, text='')
+        self.start_button = tk.Button(root, text="Start", command=self.start_regex)
+        self.start_button.grid(row=2, column=2)
 
     def select_input_dir(self):
         self.regex.dir = filedialog.askdirectory(title='Select Directory')
 
-    def remove_regex_pattern(self, pattern):
-        if self.regex.dir and pattern:
-            match pattern:
+    def _set_pattern(self, pattern):
+        self.pattern = pattern
+
+    def start_regex(self):
+        if self.regex.dir and self.pattern:
+            match self.pattern:
                 case '[...]':
                     self.regex.remove_sqr_brackets()
-                case '.mp3':
-                    self.regex.remove_redundant_mp3()
-            #self.info_label.grid(row=2, column=1, pady=10)
-            #self.info_label['text'] = 'Working'
-            #self.root.after(100, self.check_thread_completion)
+                case 'FREE DL':
+                    self.regex.remove_free_dl()
+
 
     def check_thread_completion(self):
         if self.regex.thread_completion_event.is_set():
