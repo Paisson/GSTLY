@@ -22,12 +22,16 @@ class DJToolDownloader:
         allow_playlist = "--no-playlist" if not self.allow_playlist.get() else ""
         max_downloads_option = f"--max-downloads {self.max_downloads}" if self.max_downloads > 0 else ""
 
-        command = (
-            f'yt-dlp -P {self.download_path} '
-            f'{allow_playlist} --add-metadata --embed-thumbnail --match-filter "duration < 1800" '
-            f'{max_downloads_option} --extract-audio --audio-format mp3 {search_query}'
-            )
+        # Add playlist index to the output format if playlist download is allowed
+        output_option = '--output "%(title)s.%(ext)s"'
+        if self.allow_playlist.get():
+            output_option = '--output "%(playlist_index)s - %(title)s.%(ext)s"'
 
+        command = (
+            f'yt-dlp -P "{self.download_path}" '
+            f'{allow_playlist} --add-metadata --embed-thumbnail '
+            f'{max_downloads_option} {output_option} --extract-audio --audio-format mp3 {search_query}'
+        )
 
         self.run_command(command)
         self.p.wait()
